@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                             width: 20.0,
                           ),
                           Text(
-                            kAppName,
+                            "{ "+kAppName + " }",
                             style: TextStyle(
                                 color: kPrimaryColor,
                                 fontSize: 22.0,
@@ -39,14 +39,16 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                       AllTodos(
-                        title: "Get Start",
+                        title: "Get Started",
                         desc:
                             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries",
                       ),
-                      AllTodos(),
-                      AllTodos(),
-                      AllTodos(),
-                      AllTodos(),
+                      AllTodos(
+                        title: "Get Started",
+                        desc:
+                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries",
+                      ),
+
                     ],
                   ),
                 ),
