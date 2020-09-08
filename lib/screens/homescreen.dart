@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:todotrack/models/models.dart';
+import 'package:todotrack/utils/database.dart';
 import 'package:todotrack/values/contants.dart';
 import 'package:todotrack/widgets/widgets.dart';
 import 'package:todotrack/screens/screens.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DatabaseManager databaseManager;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    databaseManager = DatabaseManager();
+    super.initState();
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +49,7 @@ class HomeScreen extends StatelessWidget {
                             width: 20.0,
                           ),
                           Text(
-                            "{ "+kAppName + " }",
+                            "{ " + kAppName + " }",
                             style: TextStyle(
                                 color: kPrimaryColor,
                                 fontSize: 22.0,
@@ -38,17 +57,49 @@ class HomeScreen extends StatelessWidget {
                           )
                         ],
                       ),
-                      AllTodos(
-                        title: "Get Started",
-                        desc:
-                            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries",
-                      ),
-                      AllTodos(
-                        title: "Get Started",
-                        desc:
-                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries",
-                      ),
+                      FutureBuilder(
+                        future: databaseManager.getAllTasks(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            List<Task> taskList = snapshot.data;
+                            return Container(
+                                child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                              physics: ClampingScrollPhysics(),
+                              shrinkWrap: true,
+                                  itemCount: taskList.length,
+                                  itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TaskScreen(task: taskList[index],),
+                                      ),
+                                    ).then((value) {
+                                      setState(() {
 
+                                      });
+                                    });
+                                  },
+                                  child: AllTodos(
+                                    title: taskList[index].taskTitle,
+                                    desc: taskList[index].taskDescription,
+                                  ),
+                                );
+                              },
+                            ));
+                          } else if (snapshot.hasError) {
+                            return Container(
+                              child: Text(snapshot.error),
+                            );
+                          } else {
+                            return Container(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
+                      )
                     ],
                   ),
                 ),
@@ -61,9 +112,11 @@ class HomeScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TaskScreen(),
+                        builder: (context) => TaskScreen(task: null,),
                       ),
-                    );
+                    ).then((value) {
+                      setState(() {});
+                    });
                   },
                   child: Container(
                     height: 50.0,
