@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todotrack/models/models.dart';
 import 'package:todotrack/screens/homescreen.dart';
+import 'package:todotrack/utils/alertdialogs.dart';
 import 'package:todotrack/utils/database.dart';
 import 'package:todotrack/values/contants.dart';
 import 'package:todotrack/widgets/widgets.dart';
@@ -56,11 +57,8 @@ class _TaskScreenState extends State<TaskScreen> {
         actions: <Widget>[
           GestureDetector(
             onTap: () async {
-              await databaseManager
-                  .deleteTask(widget.task.taskId)
-                  .then((value) {
-                Navigator.pop(context);
-              });
+              AlertDialogs alert = AlertDialogs();
+              await alert.showDialogForTotalTaskDelete(context, widget.task.taskId);
             },
             child: Visibility(
               visible: _hasTask,
@@ -71,7 +69,7 @@ class _TaskScreenState extends State<TaskScreen> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
       body: SafeArea(
@@ -204,7 +202,8 @@ class _TaskScreenState extends State<TaskScreen> {
                                               color: kDarkColor.withOpacity(0.80),
                                             ),
                                             onTap: () async {
-                                              await databaseManager.deleteTodo(todoList[index].todoId);
+                                              AlertDialogs alert = AlertDialogs();
+                                              await alert.showDialogSingleTodoDelete(context, todoList[index].todoId, todoList[index].todoTitle);
                                               setState(() {});
                                             },
                                           ),
