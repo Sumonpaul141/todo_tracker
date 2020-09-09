@@ -11,10 +11,10 @@ class Todo {
   int todoIsDone;
   int taskId;
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
     "todoId": todoId,
     "todoTitle": todoTitle,
-    "todoIsDone": todoIsDone,
+    "isDone": todoIsDone,
     "taskId" : taskId
   };
 }
