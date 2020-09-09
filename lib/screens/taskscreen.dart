@@ -208,11 +208,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                                       todoList[index].todoTitle,
                                                 ),
                                                 onTap: () async {
-                                                  int isdone = todoList[index]
-                                                              .todoIsDone ==
-                                                          0
-                                                      ? 1
-                                                      : 0;
+                                                  int isdone = todoList[index].todoIsDone == 0 ? 1 : 0;
                                                   await databaseManager
                                                       .updateTodoDone(
                                                           todoList[index]
@@ -229,14 +225,15 @@ class _TaskScreenState extends State<TaskScreen> {
                                                     .withOpacity(0.80),
                                               ),
                                               onTap: () async {
-                                                AlertDialogs alert =
-                                                    AlertDialogs();
-                                                await alert
-                                                    .showDialogSingleTodoDelete(
-                                                        context,
-                                                        todoList[index].todoId,
-                                                        todoList[index]
-                                                            .todoTitle);
+//                                                AlertDialogs alert =
+//                                                    AlertDialogs();
+//                                                await alert
+//                                                    .showDialogSingleTodoDelete(
+//                                                        context,
+//                                                        todoList[index].todoId,
+//                                                        todoList[index]
+//                                                            .todoTitle);
+                                              await databaseManager.deleteTodo(todoList[index].todoId);
                                                 setState(() {});
                                               },
                                             ),

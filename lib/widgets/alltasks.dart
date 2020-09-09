@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:todotrack/values/contants.dart';
 
-class AllTodos extends StatelessWidget {
+class AllTasks extends StatelessWidget {
   final String title, desc;
 
-  const AllTodos({
+  const AllTasks({
     Key key,
     this.title,
     this.desc,
@@ -22,12 +22,12 @@ class AllTodos extends StatelessWidget {
             decoration: BoxDecoration(
                 color: kWhiteColor,
                 borderRadius: BorderRadius.all(
-                  Radius.circular(20.0),
+                  Radius.circular(10.0),
                 ),
                 boxShadow: [BoxShadow(
-                    offset: Offset(8,8),
+                    offset: Offset(5,5),
                     blurRadius: 2.0,
-                    color: kPrimaryColor.withOpacity(0.05)
+                    color: kDarkColor.withOpacity(0.2)
                 )]
             ),
             child: Padding(
@@ -44,6 +44,10 @@ class AllTodos extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  Divider(),
                   SizedBox(
                     height: 5.0,
                   ),

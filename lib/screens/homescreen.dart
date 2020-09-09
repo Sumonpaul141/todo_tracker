@@ -88,33 +88,49 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             List<Task> taskList = snapshot.data;
-                            return Container(
-                                child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: taskList.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => TaskScreen(
-                                          task: taskList[index],
-                                        ),
-                                      ),
-                                    ).then((value) {
-                                      setState(() {});
-                                    });
-                                  },
-                                  child: AllTodos(
-                                    title: taskList[index].taskTitle,
-                                    desc: taskList[index].taskDescription,
+                            if(taskList.length == 0){
+                              return Container(
+                                height: 400.0,
+                                child: Center(
+                                  child: Text(
+                                    "No task available.. Create one",
+                                    style: TextStyle(
+                                      color: kDarkColor.withOpacity(0.5),
+                                      fontSize: 15.0
+                                    ),
                                   ),
-                                );
-                              },
-                            ));
+                                ),
+                              );
+                            }else{
+                              return Container(
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    physics: ClampingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: taskList.length,
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => TaskScreen(
+                                                task: taskList[index],
+                                              ),
+                                            ),
+                                          ).then((value) {
+                                            setState(() {});
+                                          });
+                                        },
+                                        child: AllTasks(
+                                          title: taskList[index].taskTitle,
+                                          desc: taskList[index].taskDescription,
+                                        ),
+                                      );
+                                    },
+                                  ));
+                            }
+
                           } else if (snapshot.hasError) {
                             return Container(
                               child: Text(snapshot.error),
