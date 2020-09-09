@@ -18,15 +18,32 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     databaseManager = DatabaseManager();
     super.initState();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kLiteColor,
+      appBar: AppBar(
+        backgroundColor: kPrimaryColor,
+        title: Text(
+          "{ " + kAppName + " }",
+          style: TextStyle(
+              color: kLiteColor, fontSize: 22.0, fontWeight: FontWeight.w900),
+        ),
+        leading: Container(
+          margin: EdgeInsets.all(5.0),
+          padding: EdgeInsets.all(5.0),
+          decoration: BoxDecoration(
+            color: kWhiteColor,
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: Image(
+            image: AssetImage("images/todologo.png"),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -37,25 +54,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 behavior: NoGlowBehaviour(),
                 child: SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Image(
-                            image: AssetImage("images/todologo.png"),
-                            height: 60.0,
-                            width: 60.0,
-                          ),
-                          SizedBox(
-                            width: 20.0,
-                          ),
-                          Text(
-                            "{ " + kAppName + " }",
-                            style: TextStyle(
-                                color: kPrimaryColor,
-                                fontSize: 22.0,
-                                fontWeight: FontWeight.w900),
-                          )
-                        ],
+//                      Row(
+//                        children: <Widget>[
+//                          Image(
+//                            image: AssetImage("images/todologo.png"),
+//                            height: 60.0,
+//                            width: 60.0,
+//                          ),
+//                          SizedBox(
+//                            width: 20.0,
+//                          ),
+//                          Text(
+//                            "{ " + kAppName + " }",
+//                            style: TextStyle(
+//                                color: kPrimaryColor,
+//                                fontSize: 22.0,
+//                                fontWeight: FontWeight.w900),
+//                          )
+//                        ],
+//                      ),
+
+                      Text(
+                        "Your Tasks ->",
+                        style: TextStyle(
+                            color: kPrimaryColor,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 22.0),
                       ),
                       FutureBuilder(
                         future: databaseManager.getAllTasks(),
@@ -64,22 +90,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             List<Task> taskList = snapshot.data;
                             return Container(
                                 child: ListView.builder(
-                                  scrollDirection: Axis.vertical,
+                              scrollDirection: Axis.vertical,
                               physics: ClampingScrollPhysics(),
                               shrinkWrap: true,
-                                  itemCount: taskList.length,
-                                  itemBuilder: (context, index) {
+                              itemCount: taskList.length,
+                              itemBuilder: (context, index) {
                                 return GestureDetector(
-                                  onTap: (){
+                                  onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => TaskScreen(task: taskList[index],),
+                                        builder: (context) => TaskScreen(
+                                          task: taskList[index],
+                                        ),
                                       ),
                                     ).then((value) {
-                                      setState(() {
-
-                                      });
+                                      setState(() {});
                                     });
                                   },
                                   child: AllTodos(
@@ -112,7 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TaskScreen(task: null,),
+                        builder: (context) => TaskScreen(
+                          task: null,
+                        ),
                       ),
                     ).then((value) {
                       setState(() {});

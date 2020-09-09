@@ -38,6 +38,7 @@ class TodoWidget extends StatelessWidget {
               title == null ? "Empty Todo" : title,
               style: TextStyle(
                 color: isDone ?  kPrimaryColor : kDarkColor.withOpacity(0.6),
+                fontSize: isDone ? 15.0: 14.0,
               ),
             ),
           ),

@@ -53,20 +53,21 @@ class _TaskScreenState extends State<TaskScreen> {
     return Scaffold(
       backgroundColor: kLiteColor,
       appBar: AppBar(
-        title: Text("Create a new Task.."),
+        title: Text(
+          _hasTask ? widget.task.taskTitle : "Create a new Task..",
+        ),
         actions: <Widget>[
           GestureDetector(
             onTap: () async {
               AlertDialogs alert = AlertDialogs();
-              await alert.showDialogForTotalTaskDelete(context, widget.task.taskId);
+              await alert.showDialogForTotalTaskDelete(
+                  context, widget.task.taskId);
             },
             child: Visibility(
               visible: _hasTask,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.delete
-                ),
+                child: Icon(Icons.delete),
               ),
             ),
           ),
@@ -159,7 +160,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                   taskDescription: desc,
                                 );
 
-                                if (title != "" && desc != "" && title != null && desc != null) {
+                                if (title != "" &&
+                                    desc != "" &&
+                                    title != null &&
+                                    desc != null) {
                                   await databaseManager.insertTask(task);
                                   Navigator.pop(context);
                                 } else {
@@ -175,132 +179,149 @@ class _TaskScreenState extends State<TaskScreen> {
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30.0),
-                      child: _hasTask ? FutureBuilder(
-                        future: databaseManager.getAllTodos(widget.task.taskId),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            List<Todo> todoList = snapshot.data;
-                            return Container(
-                                child: ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  physics: ClampingScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: todoList.length,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: TodoWidget(
-                                              isDone: todoList[index].todoIsDone == 0 ? false : true,
-                                              title: todoList[index].todoTitle,
+                      child: _hasTask
+                          ? FutureBuilder(
+                              future: databaseManager
+                                  .getAllTodos(widget.task.taskId),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  List<Todo> todoList = snapshot.data;
+                                  return Container(
+                                      child: ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    physics: ClampingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: todoList.length,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: GestureDetector(
+                                                child: TodoWidget(
+                                                  isDone: todoList[index]
+                                                              .todoIsDone ==
+                                                          0
+                                                      ? false
+                                                      : true,
+                                                  title:
+                                                      todoList[index].todoTitle,
+                                                ),
+                                                onTap: () async {
+                                                  int isdone = todoList[index]
+                                                              .todoIsDone ==
+                                                          0
+                                                      ? 1
+                                                      : 0;
+                                                  await databaseManager
+                                                      .updateTodoDone(
+                                                          todoList[index]
+                                                              .todoId,
+                                                          isdone);
+                                                  setState(() {});
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                          GestureDetector(
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: kDarkColor.withOpacity(0.80),
+                                            GestureDetector(
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: kDarkColor
+                                                    .withOpacity(0.80),
+                                              ),
+                                              onTap: () async {
+                                                AlertDialogs alert =
+                                                    AlertDialogs();
+                                                await alert
+                                                    .showDialogSingleTodoDelete(
+                                                        context,
+                                                        todoList[index].todoId,
+                                                        todoList[index]
+                                                            .todoTitle);
+                                                setState(() {});
+                                              },
                                             ),
-                                            onTap: () async {
-                                              AlertDialogs alert = AlertDialogs();
-                                              await alert.showDialogSingleTodoDelete(context, todoList[index].todoId, todoList[index].todoTitle);
-                                              setState(() {});
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ));
-                          } else if (snapshot.hasError) {
-                            return Container(
-                              child: Text(snapshot.error),
-                            );
-                          } else {
-                            return Container(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                        },
-                      ) : SizedBox(),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ));
+                                } else if (snapshot.hasError) {
+                                  return Container(
+                                    child: Text(snapshot.error),
+                                  );
+                                } else {
+                                  return Container(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
+                            )
+                          : SizedBox(),
                     ),
-                    SizedBox(height: 30.0,),
+                    SizedBox(
+                      height: 30.0,
+                    ),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30.0),
                       color: kLiteColor,
                       child: !_hasTask
                           ? SizedBox(
-                        width: 10.0,
-                      )
-                          : Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(2.0),
-                              decoration: BoxDecoration(
-                                color: _isDone == 1 ? kPrimaryColor : kLiteColor,
-                                borderRadius: BorderRadius.circular(10.0),
-                                border: _isDone != 1
-                                    ? Border.all(
-                                  style: BorderStyle.solid,
-                                  color: kDarkColor.withOpacity(0.4),
-                                )
-                                    : null,
-                              ),
-                              child: Icon(
-                                _isDone == 1? Icons.done : null,
-                                color: kLiteColor,
-                              ),
-                            ),
-                            SizedBox(
                               width: 10.0,
-                            ),
-                            Expanded(
-                              child: TextField(
-                                controller: todoController,
-                                style: TextStyle(
-                                  color: _isDone == 1 ?  kPrimaryColor : kDarkColor.withOpacity(0.6),
-                                ),
-                                decoration: InputDecoration(
-                                    hintText: "Add a todo to this task",
-                                    hintMaxLines: 2
-                                ),
+                            )
+                          : Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextField(
+                                      controller: todoController,
+                                      style: TextStyle(
+                                        color: _isDone == 1
+                                            ? kPrimaryColor
+                                            : kDarkColor.withOpacity(0.6),
+                                      ),
+                                      decoration: InputDecoration(
+                                          hintText:
+                                              "Add a todo to this task...",
+                                          hintMaxLines: 2),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      String todoTitle =
+                                          todoController.value.text.toString();
+                                      if (todoTitle != "" &&
+                                          todoTitle != null) {
+                                        Todo todo = Todo(
+                                            todoTitle: todoTitle,
+                                            todoIsDone: 0,
+                                            taskId: widget.task.taskId);
+                                        await databaseManager.insertTodo(todo);
+                                        todoController.clear();
+                                        print("todo added to the task " +
+                                            widget.task.taskId.toString());
+                                        setState(() {});
+                                      } else {
+                                        print("Must have a todo to print");
+                                      }
+                                    },
+                                    child: Container(
+                                      height: 30.0,
+                                      width: 30.0,
+                                      decoration: BoxDecoration(
+                                          color: kDarkColor,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                      child: Icon(
+                                        Icons.add,
+                                        color: kLiteColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () async {
-                                String todoTitle = todoController.value.text.toString();
-                                if(todoTitle != "" && todoTitle != null){
-                                  Todo todo = Todo(
-                                      todoTitle: todoTitle,
-                                      todoIsDone: 1,
-                                      taskId: widget.task.taskId
-                                  );
-                                  await databaseManager.insertTodo(todo);
-                                  todoController.clear();
-                                  print("todo added to the task "+ widget.task.taskId.toString());
-                                  setState(() {});
-                                }else{
-                                  print("Must have a todo to print");
-                                }
-                              },
-                              child: Container(
-                                height: 30.0,
-                                width: 30.0,
-                                decoration: BoxDecoration(
-                                    color: kDarkColor,
-                                    borderRadius: BorderRadius.circular(10.0)
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  color: kLiteColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ],
                 ),

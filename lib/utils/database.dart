@@ -82,4 +82,10 @@ class DatabaseManager{
     await openDb();
     await _database.rawDelete("DELETE FROM $todoTableName WHERE $colTodoId = '$id'");
   }
+
+  Future<void> updateTodoDone(int id, int isDone) async {
+    await openDb();
+    await _database.rawUpdate("UPDATE todo SET isDone = '$isDone' WHERE $colTodoId = '$id'");
+  }
+
 }
