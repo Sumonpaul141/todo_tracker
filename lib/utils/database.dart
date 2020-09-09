@@ -77,4 +77,9 @@ class DatabaseManager{
     await _database.rawDelete("DELETE FROM $taskTableName WHERE $colTaskId = '$id'");
     await _database.rawDelete("DELETE FROM $todoTableName WHERE $colTodoTaskID = '$id'");
   }
+
+  Future<void> deleteTodo(int id) async {
+    await openDb();
+    await _database.rawDelete("DELETE FROM $todoTableName WHERE $colTodoId = '$id'");
+  }
 }

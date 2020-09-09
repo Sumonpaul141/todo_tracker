@@ -56,7 +56,6 @@ class _TaskScreenState extends State<TaskScreen> {
         actions: <Widget>[
           GestureDetector(
             onTap: () async {
-
               await databaseManager
                   .deleteTask(widget.task.taskId)
                   .then((value) {
@@ -190,9 +189,27 @@ class _TaskScreenState extends State<TaskScreen> {
                                   shrinkWrap: true,
                                   itemCount: todoList.length,
                                   itemBuilder: (context, index) {
-                                    return TodoWidget(
-                                      isDone: todoList[index].todoIsDone == 0 ? false : true,
-                                      title: todoList[index].todoTitle,
+                                    return Container(
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: TodoWidget(
+                                              isDone: todoList[index].todoIsDone == 0 ? false : true,
+                                              title: todoList[index].todoTitle,
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            child: Icon(
+                                              Icons.delete,
+                                              color: kDarkColor.withOpacity(0.80),
+                                            ),
+                                            onTap: () async {
+                                              await databaseManager.deleteTodo(todoList[index].todoId);
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     );
                                   },
                                 ));
@@ -208,6 +225,7 @@ class _TaskScreenState extends State<TaskScreen> {
                         },
                       ) : SizedBox(),
                     ),
+                    SizedBox(height: 30.0,),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30.0),
                       color: kLiteColor,
