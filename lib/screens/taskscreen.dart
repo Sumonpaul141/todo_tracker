@@ -21,6 +21,7 @@ class _TaskScreenState extends State<TaskScreen> {
   bool _hasTask;
   String taskTitle, taskDescription;
   int _isDone = 0;
+  bool _titleValidate = false, _descValidate = false, _todoValidate = false;
 
   @override
   void initState() {
@@ -48,6 +49,60 @@ class _TaskScreenState extends State<TaskScreen> {
     super.dispose();
   }
 
+  void saveDataToDatabase() async {
+    String title =
+    titleController.value.text.toString();
+    String desc =
+    descController.value.text.toString();
+    Task task = Task(
+      taskTitle: title,
+      taskDescription: desc,
+    );
+
+    if (title != "" &&
+        desc != "" &&
+        title != null &&
+        desc != null) {
+      await databaseManager.insertTask(task);
+      Navigator.pop(context);
+    } else {
+      print("Fill both the fields");
+      setState(() {
+        titleController.text.isEmpty
+            ? _titleValidate = true
+            : _titleValidate = false;
+        descController.text.isEmpty
+            ? _descValidate = true
+            : _descValidate = false;
+      });
+    }
+  }
+
+  void saveTodoToDatabase() async {
+    String todoTitle =
+    todoController.value.text.toString();
+    if (todoTitle != "" &&
+        todoTitle != null) {
+      Todo todo = Todo(
+          todoTitle: todoTitle,
+          todoIsDone: 0,
+          taskId: widget.task.taskId);
+      await databaseManager.insertTodo(todo);
+      todoController.clear();
+      print("todo added to the task " +
+          widget.task.taskId.toString());
+      setState(() {
+        _todoValidate = false;
+      });
+    } else {
+      setState(() {
+        todoController.text.isEmpty
+            ? _todoValidate = true
+            : _todoValidate = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +121,7 @@ class _TaskScreenState extends State<TaskScreen> {
             child: Visibility(
               visible: _hasTask,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(right : 16.0),
                 child: Icon(Icons.delete),
               ),
             ),
@@ -96,18 +151,22 @@ class _TaskScreenState extends State<TaskScreen> {
                       ),
                       child: _hasTask
                           ? Text(
-                              taskTitle,
-                              style: TextStyle(color: kPrimaryColor),
-                            )
+                            taskTitle,
+                            style: TextStyle(color: kPrimaryColor),
+                          )
                           : TextField(
                               controller: titleController,
                               decoration: InputDecoration(
                                 hintText: "Enter Task Title ",
+                                errorText: _titleValidate
+                                    ? "Title can't be empty"
+                                    : null,
                                 border: InputBorder.none,
                               ),
                               style: TextStyle(
-                                  color: kPrimaryColor,
-                                  fontWeight: FontWeight.w900),
+                                color: kPrimaryColor,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                     ),
                     Container(
@@ -128,6 +187,9 @@ class _TaskScreenState extends State<TaskScreen> {
                               controller: descController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
+                                errorText: _descValidate
+                                    ? "Description can't be empty"
+                                    : null,
                                 hintText:
                                     "Enter the description of your task...",
                                 hintStyle: TextStyle(
@@ -150,25 +212,8 @@ class _TaskScreenState extends State<TaskScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
-                              onPressed: () async {
-                                String title =
-                                    titleController.value.text.toString();
-                                String desc =
-                                    descController.value.text.toString();
-                                Task task = Task(
-                                  taskTitle: title,
-                                  taskDescription: desc,
-                                );
-
-                                if (title != "" &&
-                                    desc != "" &&
-                                    title != null &&
-                                    desc != null) {
-                                  await databaseManager.insertTask(task);
-                                  Navigator.pop(context);
-                                } else {
-                                  print("Fill both the fields");
-                                }
+                              onPressed: () {
+                                saveDataToDatabase();
                               },
                               child: Text(
                                 "save",
@@ -199,21 +244,13 @@ class _TaskScreenState extends State<TaskScreen> {
                                             Expanded(
                                               child: GestureDetector(
                                                 child: TodoWidget(
-                                                  isDone: todoList[index]
-                                                              .todoIsDone ==
-                                                          0
-                                                      ? false
-                                                      : true,
+                                                  isDone: todoList[index].todoIsDone == 0 ? false : true,
                                                   title:
                                                       todoList[index].todoTitle,
                                                 ),
                                                 onTap: () async {
                                                   int isdone = todoList[index].todoIsDone == 0 ? 1 : 0;
-                                                  await databaseManager
-                                                      .updateTodoDone(
-                                                          todoList[index]
-                                                              .todoId,
-                                                          isdone);
+                                                  await databaseManager.updateTodoDone(todoList[index].todoId, isdone);
                                                   setState(() {});
                                                 },
                                               ),
@@ -225,15 +262,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                                     .withOpacity(0.80),
                                               ),
                                               onTap: () async {
-//                                                AlertDialogs alert =
-//                                                    AlertDialogs();
-//                                                await alert
-//                                                    .showDialogSingleTodoDelete(
-//                                                        context,
-//                                                        todoList[index].todoId,
-//                                                        todoList[index]
-//                                                            .todoTitle);
-                                              await databaseManager.deleteTodo(todoList[index].todoId);
+                                                await databaseManager
+                                                    .deleteTodo(
+                                                        todoList[index].todoId);
                                                 setState(() {});
                                               },
                                             ),
@@ -273,35 +304,28 @@ class _TaskScreenState extends State<TaskScreen> {
                                   Expanded(
                                     child: TextField(
                                       controller: todoController,
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: null,
                                       style: TextStyle(
                                         color: _isDone == 1
                                             ? kPrimaryColor
                                             : kDarkColor.withOpacity(0.6),
                                       ),
                                       decoration: InputDecoration(
-                                          hintText:
-                                              "Add a todo to this task...",
-                                          hintMaxLines: 2),
+                                        hintText: "Add a todo to this task...",
+                                        hintMaxLines: 2,
+                                        errorText: _todoValidate
+                                            ? "Type an activity here"
+                                            : null,
+                                      ),
                                     ),
                                   ),
+                                  SizedBox(
+                                    width: 10.0,
+                                  ),
                                   GestureDetector(
-                                    onTap: () async {
-                                      String todoTitle =
-                                          todoController.value.text.toString();
-                                      if (todoTitle != "" &&
-                                          todoTitle != null) {
-                                        Todo todo = Todo(
-                                            todoTitle: todoTitle,
-                                            todoIsDone: 0,
-                                            taskId: widget.task.taskId);
-                                        await databaseManager.insertTodo(todo);
-                                        todoController.clear();
-                                        print("todo added to the task " +
-                                            widget.task.taskId.toString());
-                                        setState(() {});
-                                      } else {
-                                        print("Must have a todo to print");
-                                      }
+                                    onTap: ()  {
+                                      saveTodoToDatabase();
                                     },
                                     child: Container(
                                       height: 30.0,
@@ -319,6 +343,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                 ],
                               ),
                             ),
+                    ),
+                    SizedBox(
+                      height: 30.0,
                     ),
                   ],
                 ),

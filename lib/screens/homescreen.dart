@@ -27,21 +27,28 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: kLiteColor,
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
-        title: Text(
-          "{ " + kAppName + " }",
-          style: TextStyle(
-              color: kLiteColor, fontSize: 22.0, fontWeight: FontWeight.w900),
-        ),
-        leading: Container(
-          margin: EdgeInsets.all(5.0),
-          padding: EdgeInsets.all(5.0),
-          decoration: BoxDecoration(
-            color: kWhiteColor,
-            borderRadius: BorderRadius.circular(30.0),
-          ),
-          child: Image(
-            image: AssetImage("images/todologo.png"),
-          ),
+        title: Row(
+          children: <Widget>[
+//            Container(
+//              margin: EdgeInsets.symmetric(horizontal: 10.0),
+//              padding: EdgeInsets.all(5.0),
+//              height: 50.0,
+//              width: 50.0,
+//              decoration: BoxDecoration(
+//                color: kWhiteColor,
+//                borderRadius: BorderRadius.circular(30.0),
+//              ),
+//              child: Image(
+//                image: AssetImage("images/todologo.png"),
+//              ),
+//            ),
+            SizedBox(width: 10.0,),
+            Text(
+              "{ " + kAppName + " }",
+              style: TextStyle(
+                  color: kLiteColor, fontSize: 22.0, fontWeight: FontWeight.w900),
+            ),
+          ],
         ),
       ),
       body: SafeArea(
@@ -75,28 +82,23 @@ class _HomeScreenState extends State<HomeScreen> {
 //                          )
 //                        ],
 //                      ),
-
-                      Text(
-                        "Your Tasks ->",
-                        style: TextStyle(
-                            color: kPrimaryColor,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 22.0),
-                      ),
                       FutureBuilder(
                         future: databaseManager.getAllTasks(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             List<Task> taskList = snapshot.data;
                             if(taskList.length == 0){
-                              return Container(
-                                height: 400.0,
-                                child: Center(
-                                  child: Text(
-                                    "No task available.. Create one",
-                                    style: TextStyle(
-                                      color: kDarkColor.withOpacity(0.5),
-                                      fontSize: 15.0
+                              return Center(
+                                child: Container(
+                                  height: 300.0,
+                                  width: 200.0,
+                                  child: Center(
+                                    child: Text(
+                                      "No task / project available... \nYou can add one and start creating your list..\nPress the (+) button to add",
+                                      style: TextStyle(
+                                        color: kDarkColor.withOpacity(0.5),
+                                        fontSize: 15.0
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -122,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             setState(() {});
                                           });
                                         },
-                                        child: AllTasks(
+                                        child: TaskWidget(
                                           title: taskList[index].taskTitle,
                                           desc: taskList[index].taskDescription,
                                         ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:todotrack/values/contants.dart';
 
-class AllTasks extends StatelessWidget {
+class TaskWidget extends StatelessWidget {
   final String title, desc;
 
-  const AllTasks({
+  const TaskWidget({
     Key key,
     this.title,
     this.desc,
@@ -30,37 +30,41 @@ class AllTasks extends StatelessWidget {
                     color: kDarkColor.withOpacity(0.2)
                 )]
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: double.maxFinite,
+                  padding: EdgeInsets.symmetric(vertical : 12.0, horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    color: kPrimaryColor,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(10.0), topLeft: Radius.circular(10.0)),
+                  ),
+                  child: Text(
                     title != null ? title : "Undefined title",
                     maxLines: 1,
                     style: TextStyle(
-                      color: kPrimaryColor,
+                      color: kLiteColor,
                       fontSize: 20.0,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  Divider(),
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  Text(
-                    desc != null ? desc : "For this todo you forget to add a description, so this is not showing, you can add a description, or leave as it is",
+                ),
+                SizedBox(
+                  height: 5.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    desc == null || desc == "" ? "For this todo you forget to add a description, so this is not showing, you can add a description, or leave as it is" : desc,
                     style: TextStyle(
                       color: kPrimaryColor,
                       fontSize: 12.0,
                     ),
                     maxLines: 4,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           )
         ],
