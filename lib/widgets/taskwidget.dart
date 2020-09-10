@@ -56,7 +56,7 @@ class TaskWidget extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    desc == null || desc == "" ? "For this todo you forget to add a description, so this is not showing, you can add a description, or leave as it is" : desc,
+                    desc == null || desc == "" ? "No description added!!" : desc,
                     style: TextStyle(
                       color: kPrimaryColor,
                       fontSize: 12.0,
@@ -64,6 +64,7 @@ class TaskWidget extends StatelessWidget {
                     maxLines: 4,
                   ),
                 ),
+
               ],
             ),
           )

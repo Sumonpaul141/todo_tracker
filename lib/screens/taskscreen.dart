@@ -140,6 +140,8 @@ class _TaskScreenState extends State<TaskScreen> {
                     SizedBox(
                       height: 20.0,
                     ),
+
+                    //add task title
                     Container(
                       width: double.infinity,
                       margin:
@@ -169,6 +171,8 @@ class _TaskScreenState extends State<TaskScreen> {
                               ),
                             ),
                     ),
+
+                    //add task desc
                     Container(
                       width: double.infinity,
                       margin:
@@ -201,6 +205,8 @@ class _TaskScreenState extends State<TaskScreen> {
                                   fontSize: 12.0, color: kPrimaryColor),
                             ),
                     ),
+
+                    //save button and button action
                     Container(
                       margin: EdgeInsets.only(left: 20.0),
                       child: _hasTask
@@ -222,6 +228,8 @@ class _TaskScreenState extends State<TaskScreen> {
                               color: kPrimaryColor,
                             ),
                     ),
+
+                    // toodo list here
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30.0),
                       child: _hasTask
@@ -289,6 +297,8 @@ class _TaskScreenState extends State<TaskScreen> {
                     SizedBox(
                       height: 30.0,
                     ),
+
+                    //add a toodo widget here
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 30.0),
                       color: kLiteColor,

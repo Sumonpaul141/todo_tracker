@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:todotrack/models/models.dart';
 import 'package:todotrack/utils/database.dart';
@@ -12,13 +14,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DatabaseManager databaseManager;
-
+  Timer timer;
   @override
   void initState() {
     // TODO: implement initState
     databaseManager = DatabaseManager();
     super.initState();
-    setState(() {});
   }
 
   @override
