@@ -30,19 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: kPrimaryColor,
         title: Row(
           children: <Widget>[
-//            Container(
-//              margin: EdgeInsets.symmetric(horizontal: 10.0),
-//              padding: EdgeInsets.all(5.0),
-//              height: 50.0,
-//              width: 50.0,
-//              decoration: BoxDecoration(
-//                color: kWhiteColor,
-//                borderRadius: BorderRadius.circular(30.0),
-//              ),
-//              child: Image(
-//                image: AssetImage("images/todologo.png"),
-//              ),
-//            ),
+
             SizedBox(width: 10.0,),
             Text(
               "{ " + kAppName + " }",

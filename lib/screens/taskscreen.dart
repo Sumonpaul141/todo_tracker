@@ -333,6 +333,23 @@ class _TaskScreenState extends State<TaskScreen> {
                                   SizedBox(
                                     width: 10.0,
                                   ),
+//                                  GestureDetector(
+//                                    child: Container(
+//                                      height: 30.0,
+//                                      width: 30.0,
+//                                      decoration: BoxDecoration(
+//                                          color: kDarkColor,
+//                                          borderRadius:
+//                                          BorderRadius.circular(10.0)),
+//                                      child: Icon(
+//                                        Icons.watch,
+//                                        color: kLiteColor,
+//                                      ),
+//                                    ),
+//                                  ),
+//                                  SizedBox(
+//                                    width: 10.0,
+//                                  ),
                                   GestureDetector(
                                     onTap: ()  {
                                       saveTodoToDatabase();
