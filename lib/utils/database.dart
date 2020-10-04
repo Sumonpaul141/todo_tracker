@@ -17,6 +17,7 @@ class DatabaseManager{
   String colTodoTitle= "todoTitle";
   String colTodoIsDone = "isDone";
   String colTodoTaskID = "taskId";
+  String colTodoDeadlineDateTime= "deadlineDateTime";
 
   Future openDb() async {
     _database = await openDatabase(
@@ -24,7 +25,7 @@ class DatabaseManager{
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute("CREATE TABLE $taskTableName($colTaskId INTEGER PRIMARY KEY, $colTaskTitle TEXT, $colTaskDesc TEXT)");
-        await db.execute("CREATE TABLE $todoTableName($colTodoId INTEGER PRIMARY KEY, $colTodoTitle TEXT, $colTodoIsDone int, $colTodoTaskID int)");
+        await db.execute("CREATE TABLE $todoTableName($colTodoId INTEGER PRIMARY KEY, $colTodoTitle TEXT, $colTodoIsDone int, $colTodoTaskID int, $colTodoDeadlineDateTime TEXT)");
       }
     );
   }
@@ -68,6 +69,7 @@ class DatabaseManager{
         todoTitle: maps[i][colTodoTitle],
         todoIsDone: maps[i][colTodoIsDone],
         taskId: maps[i][colTaskId],
+        deadlineDateTime: maps[i][colTodoDeadlineDateTime],
       );
     });
   }

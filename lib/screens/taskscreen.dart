@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:todotrack/models/models.dart';
 import 'package:todotrack/screens/homescreen.dart';
 import 'package:todotrack/utils/alertdialogs.dart';
@@ -22,6 +25,7 @@ class _TaskScreenState extends State<TaskScreen> {
   String taskTitle, taskDescription;
   int _isDone = 0;
   bool _titleValidate = false, _descValidate = false, _todoValidate = false;
+  DateTime deadlineDateTime;
 
   @override
   void initState() {
@@ -49,20 +53,32 @@ class _TaskScreenState extends State<TaskScreen> {
     super.dispose();
   }
 
+  Future<DateTime> _showDatePicker(BuildContext context) {
+    final date = showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    return date;
+  }
+
+  Future<TimeOfDay> _showTimePicker(BuildContext context) {
+    final time = showTimePicker(
+        context: context,
+        initialTime:
+            TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().hour));
+    return time;
+  }
+
   void saveDataToDatabase() async {
-    String title =
-    titleController.value.text.toString();
-    String desc =
-    descController.value.text.toString();
+    String title = titleController.value.text.toString();
+    String desc = descController.value.text.toString();
     Task task = Task(
       taskTitle: title,
       taskDescription: desc,
     );
-
-    if (title != "" &&
-        desc != "" &&
-        title != null &&
-        desc != null) {
+    if (title != "" && desc != "" && title != null && desc != null) {
       await databaseManager.insertTask(task);
       Navigator.pop(context);
     } else {
@@ -79,18 +95,23 @@ class _TaskScreenState extends State<TaskScreen> {
   }
 
   void saveTodoToDatabase() async {
-    String todoTitle =
-    todoController.value.text.toString();
-    if (todoTitle != "" &&
-        todoTitle != null) {
+    String todoTitle = todoController.value.text.toString();
+    if (todoTitle != "" && todoTitle != null) {
+      deadlineDateTime = await DatePicker.showDateTimePicker(context);
+      String dateTimeToString;
+      if(deadlineDateTime == null){
+        dateTimeToString = null;
+      }else{
+        dateTimeToString = deadlineDateTime.toIso8601String();
+      }
       Todo todo = Todo(
           todoTitle: todoTitle,
           todoIsDone: 0,
-          taskId: widget.task.taskId);
+          taskId: widget.task.taskId,
+          deadlineDateTime: dateTimeToString);
       await databaseManager.insertTodo(todo);
       todoController.clear();
-      print("todo added to the task " +
-          widget.task.taskId.toString());
+      print("todo added to the task " + widget.task.taskId.toString());
       setState(() {
         _todoValidate = false;
       });
@@ -121,7 +142,7 @@ class _TaskScreenState extends State<TaskScreen> {
             child: Visibility(
               visible: _hasTask,
               child: Padding(
-                padding: const EdgeInsets.only(right : 16.0),
+                padding: const EdgeInsets.only(right: 16.0),
                 child: Icon(Icons.delete),
               ),
             ),
@@ -153,9 +174,13 @@ class _TaskScreenState extends State<TaskScreen> {
                       ),
                       child: _hasTask
                           ? Text(
-                            taskTitle,
-                            style: TextStyle(color: kPrimaryColor),
-                          )
+                              taskTitle,
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )
                           : TextField(
                               controller: titleController,
                               decoration: InputDecoration(
@@ -185,7 +210,11 @@ class _TaskScreenState extends State<TaskScreen> {
                       child: _hasTask
                           ? Text(
                               taskDescription,
-                              style: TextStyle(color: kPrimaryColor),
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.w400,
+                              ),
                             )
                           : TextField(
                               controller: descController,
@@ -247,18 +276,40 @@ class _TaskScreenState extends State<TaskScreen> {
                                     itemCount: todoList.length,
                                     itemBuilder: (context, index) {
                                       return Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 0.0, horizontal: 10.0),
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 2.0, horizontal: 0.0),
+                                        decoration: BoxDecoration(
+                                          color: kWhiteColor,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
                                         child: Row(
                                           children: <Widget>[
                                             Expanded(
                                               child: GestureDetector(
                                                 child: TodoWidget(
-                                                  isDone: todoList[index].todoIsDone == 0 ? false : true,
+                                                  isDone: todoList[index]
+                                                              .todoIsDone ==
+                                                          0
+                                                      ? false
+                                                      : true,
                                                   title:
                                                       todoList[index].todoTitle,
+                                                  dateTime: todoList[index].deadlineDateTime,
                                                 ),
                                                 onTap: () async {
-                                                  int isdone = todoList[index].todoIsDone == 0 ? 1 : 0;
-                                                  await databaseManager.updateTodoDone(todoList[index].todoId, isdone);
+                                                  int isdone = todoList[index]
+                                                              .todoIsDone ==
+                                                          0
+                                                      ? 1
+                                                      : 0;
+                                                  await databaseManager
+                                                      .updateTodoDone(
+                                                          todoList[index]
+                                                              .todoId,
+                                                          isdone);
                                                   setState(() {});
                                                 },
                                               ),
@@ -266,8 +317,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                             GestureDetector(
                                               child: Icon(
                                                 Icons.delete,
-                                                color: kDarkColor
-                                                    .withOpacity(0.80),
+                                                color: kPrimaryColor,
                                               ),
                                               onTap: () async {
                                                 await databaseManager
@@ -333,37 +383,22 @@ class _TaskScreenState extends State<TaskScreen> {
                                   SizedBox(
                                     width: 10.0,
                                   ),
-//                                  GestureDetector(
-//                                    child: Container(
-//                                      height: 30.0,
-//                                      width: 30.0,
-//                                      decoration: BoxDecoration(
-//                                          color: kDarkColor,
-//                                          borderRadius:
-//                                          BorderRadius.circular(10.0)),
-//                                      child: Icon(
-//                                        Icons.watch,
-//                                        color: kLiteColor,
-//                                      ),
-//                                    ),
-//                                  ),
-//                                  SizedBox(
-//                                    width: 10.0,
-//                                  ),
                                   GestureDetector(
-                                    onTap: ()  {
+                                    onTap: () async {
                                       saveTodoToDatabase();
                                     },
                                     child: Container(
-                                      height: 30.0,
-                                      width: 30.0,
+                                      height: 40.0,
+                                      width: 50.0,
                                       decoration: BoxDecoration(
                                           color: kDarkColor,
                                           borderRadius:
                                               BorderRadius.circular(10.0)),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: kLiteColor,
+                                      child: Center(
+                                        child: Text(
+                                          "Add",
+                                          style: TextStyle(color: kLiteColor),
+                                        ),
                                       ),
                                     ),
                                   ),
