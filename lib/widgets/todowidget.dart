@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todotrack/values/contants.dart';
 
 class TodoWidget extends StatelessWidget {
@@ -51,10 +52,11 @@ class TodoWidget extends StatelessWidget {
                   ),
                   textAlign: TextAlign.justify,
                 ),
+                !isDone ? SizedBox(height: 5.0,) : SizedBox(),
                 Visibility(
                   visible: dateTime != null,
                   child: Text(
-                    dateTime == null ? "No deadline" : "Time "+ dateTime.substring(11, 16),
+                    dateTime == null ? "No deadline" : "Time "+  DateFormat.jm().format(DateTime.parse(dateTime)),
                     style: TextStyle(
                       decoration: isDone ? TextDecoration.lineThrough : null,
                       color: kDarkColor.withOpacity(0.6),
@@ -65,7 +67,8 @@ class TodoWidget extends StatelessWidget {
                 Visibility(
                   visible: dateTime != null,
                   child: Text(
-                    dateTime == null ? "No deadline" : "Date "+ dateTime.substring(0, 10),
+//                    dateTime == null ? "No deadline" : "Date "+ dateTime.substring(0, 10),
+                    dateTime == null ? "No deadline" : "Date (m/d/y) : "+ DateFormat.yMd().format(DateTime.parse(dateTime)),
                     style: TextStyle(
                       decoration: isDone ? TextDecoration.lineThrough : null,
                       color: kDarkColor.withOpacity(0.6),
