@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:todotrack/models/models.dart';
+import 'package:todotrack/utils/alertdialogs.dart';
 import 'package:todotrack/utils/database.dart';
 import 'package:todotrack/values/contants.dart';
 import 'package:todotrack/widgets/widgets.dart';
@@ -113,6 +114,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             setState(() {});
                                           });
                                         },
+//                                        onLongPress: () async {
+//                                          AlertDialogs alert = AlertDialogs();
+//                                          await alert.showDialogSingleTaskUpdate(
+//                                              context, taskList[index].taskId, taskList[index].taskTitle, taskList[index].taskDescription);
+//                                        },
                                         child: TaskWidget(
                                           title: taskList[index].taskTitle,
                                           desc: taskList[index].taskDescription,
