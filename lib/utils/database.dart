@@ -51,6 +51,7 @@ class DatabaseManager{
   Future<List<Task>> getAllTasks() async {
     await openDb();
     final List<Map<String, dynamic>> maps = await _database.rawQuery("SELECT * FROM $taskTableName ORDER BY $colTaskId DESC");
+    print(maps);
     return List.generate(maps.length, (i) {
       return Task(
         taskId: maps[i][colTaskId],
@@ -63,6 +64,7 @@ class DatabaseManager{
   Future<List<Todo>> getAllTodos(int taskId) async {
     await openDb();
     final List<Map<String, dynamic>> maps = await _database.rawQuery("SELECT * FROM $todoTableName WHERE $colTodoTaskID = $taskId");
+    _database.close();
     return List.generate(maps.length, (i) {
       return Todo(
         todoId: maps[i][colTodoId],
@@ -72,22 +74,32 @@ class DatabaseManager{
         deadlineDateTime: maps[i][colTodoDeadlineDateTime],
       );
     });
+
   }
 
   Future<void> deleteTask(int id) async {
     await openDb();
     await _database.rawDelete("DELETE FROM $taskTableName WHERE $colTaskId = '$id'");
     await _database.rawDelete("DELETE FROM $todoTableName WHERE $colTodoTaskID = '$id'");
+    _database.close();
   }
 
   Future<void> deleteTodo(int id) async {
     await openDb();
     await _database.rawDelete("DELETE FROM $todoTableName WHERE $colTodoId = '$id'");
+    _database.close();
   }
 
   Future<void> updateTodoDone(int id, int isDone) async {
     await openDb();
     await _database.rawUpdate("UPDATE todo SET isDone = '$isDone' WHERE $colTodoId = '$id'");
+    _database.close();
+  }
+
+  Future<void> updateTaskDone(int id, String title, String description) async {
+    await openDb();
+    await _database.rawUpdate("UPDATE $taskTableName SET $colTaskTitle = '$title', $colTaskDesc = '$description'  WHERE $colTaskId = '$id'");
+    _database.close();
   }
 
 }

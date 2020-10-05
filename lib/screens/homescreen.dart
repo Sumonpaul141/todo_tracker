@@ -53,25 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-//                      Row(
-//                        children: <Widget>[
-//                          Image(
-//                            image: AssetImage("images/todologo.png"),
-//                            height: 60.0,
-//                            width: 60.0,
-//                          ),
-//                          SizedBox(
-//                            width: 20.0,
-//                          ),
-//                          Text(
-//                            "{ " + kAppName + " }",
-//                            style: TextStyle(
-//                                color: kPrimaryColor,
-//                                fontSize: 22.0,
-//                                fontWeight: FontWeight.w900),
-//                          )
-//                        ],
-//                      ),
                       FutureBuilder(
                         future: databaseManager.getAllTasks(),
                         builder: (context, snapshot) {
@@ -111,14 +92,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                           ).then((value) {
-                                            setState(() {});
+                                            setState(() {
+                                            });
                                           });
                                         },
-//                                        onLongPress: () async {
-//                                          AlertDialogs alert = AlertDialogs();
-//                                          await alert.showDialogSingleTaskUpdate(
-//                                              context, taskList[index].taskId, taskList[index].taskTitle, taskList[index].taskDescription);
-//                                        },
+                                        onLongPress: () async {
+                                          AlertDialogs alert = AlertDialogs();
+                                          await alert.showDialogSingleTaskUpdate(
+                                              context, taskList[index].taskId, taskList[index].taskTitle,taskList[index].taskDescription );
+                                        },
                                         child: TaskWidget(
                                           title: taskList[index].taskTitle,
                                           desc: taskList[index].taskDescription,
@@ -156,7 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ).then((value) {
-                      setState(() {});
+                      setState(() {
+                      });
                     });
                   },
                   child: Container(
