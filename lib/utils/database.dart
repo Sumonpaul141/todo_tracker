@@ -51,7 +51,6 @@ class DatabaseManager{
   Future<List<Task>> getAllTasks() async {
     await openDb();
     final List<Map<String, dynamic>> maps = await _database.rawQuery("SELECT * FROM $taskTableName ORDER BY $colTaskId DESC");
-    print(maps);
     return List.generate(maps.length, (i) {
       return Task(
         taskId: maps[i][colTaskId],
