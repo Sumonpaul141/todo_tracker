@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:todotrack/models/task.dart';
 import 'package:todotrack/utils/database.dart';
 import 'package:todotrack/values/contants.dart';
+import 'dart:async';
 
 class AlertDialogs{
   DatabaseManager databaseManager;
-  TextEditingController titleCont = TextEditingController();
-  TextEditingController descCont = TextEditingController();
+  static TextEditingController titleCont = TextEditingController();
+  static TextEditingController descCont = TextEditingController();
 
-
-  Future<void> showDialogForTotalTaskDelete(BuildContext context, int taskId) async {
+  static void dispose(){
+    titleCont.dispose();
+    descCont.dispose();
+  }
+   Future<void> showDialogForTotalTaskDelete(BuildContext context, int taskId) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -145,5 +149,5 @@ class AlertDialogs{
       },
     );
   }
-
 }
+

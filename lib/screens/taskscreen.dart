@@ -51,6 +51,7 @@ class _TaskScreenState extends State<TaskScreen> {
     todoController.dispose();
     titleController.dispose();
     descController.dispose();
+    AlertDialogs.dispose();
     super.dispose();
   }
 
