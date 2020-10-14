@@ -24,6 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    AlertDialogs.dispose();
+    super.dispose();
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kLiteColor,
@@ -98,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         },
                                         onLongPress: () async {
                                           AlertDialogs alert = AlertDialogs();
+                                          AlertDialogs.init();
                                           await alert.showDialogSingleTaskUpdate(
                                               context, taskList[index].taskId, taskList[index].taskTitle,taskList[index].taskDescription );
                                         },
@@ -112,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           } else if (snapshot.hasError) {
                             return Container(
-                              child: Text(snapshot.error),
+                              child: Text(snapshot.error.toString()),
                             );
                           } else {
                             return Container(

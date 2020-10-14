@@ -7,9 +7,13 @@ import 'dart:async';
 
 class AlertDialogs{
   DatabaseManager databaseManager;
-  static TextEditingController titleCont = TextEditingController();
-  static TextEditingController descCont = TextEditingController();
+  static TextEditingController titleCont;
+  static TextEditingController descCont;
 
+  static void init(){
+    titleCont = TextEditingController();
+    descCont = TextEditingController();
+  }
   static void dispose(){
     titleCont.dispose();
     descCont.dispose();

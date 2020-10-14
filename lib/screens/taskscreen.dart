@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
@@ -51,26 +52,7 @@ class _TaskScreenState extends State<TaskScreen> {
     todoController.dispose();
     titleController.dispose();
     descController.dispose();
-    AlertDialogs.dispose();
     super.dispose();
-  }
-
-  Future<DateTime> _showDatePicker(BuildContext context) {
-    final date = showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    return date;
-  }
-
-  Future<TimeOfDay> _showTimePicker(BuildContext context) {
-    final time = showTimePicker(
-        context: context,
-        initialTime:
-            TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().hour));
-    return time;
   }
 
   void saveDataToDatabase() async {
@@ -81,6 +63,7 @@ class _TaskScreenState extends State<TaskScreen> {
       taskDescription: desc,
     );
     if (title != "" && desc != "" && title != null && desc != null) {
+//    if (title != ""&& title != null) {
       await databaseManager.insertTask(task);
       Navigator.pop(context);
     } else {
@@ -99,12 +82,12 @@ class _TaskScreenState extends State<TaskScreen> {
   void saveTodoToDatabase() async {
     String todoTitle = todoController.value.text.toString();
     if (todoTitle != "" && todoTitle != null) {
-      deadlineDateTime = await DatePicker.showDateTimePicker(context);
       String dateTimeToString;
       if(deadlineDateTime == null){
         dateTimeToString = null;
       }else{
         dateTimeToString = deadlineDateTime.toIso8601String();
+        deadlineDateTime = null;
       }
       Todo todo = Todo(
           todoTitle: todoTitle,
@@ -359,31 +342,69 @@ class _TaskScreenState extends State<TaskScreen> {
                               width: 10.0,
                             )
                           : Container(
+                              padding: EdgeInsets.symmetric(vertical : 10.0 , horizontal: 10.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: kWhiteColor
+                              ),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: <Widget>[
                                   Expanded(
-                                    child: TextField(
-                                      controller: todoController,
-                                      keyboardType: TextInputType.multiline,
-                                      maxLines: null,
-                                      style: TextStyle(
-                                        color: _isDone == 1
-                                            ? kPrimaryColor
-                                            : kDarkColor.withOpacity(0.6),
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: "Add a todo to this task...",
-                                        hintMaxLines: 2,
-                                        errorText: _todoValidate
-                                            ? "Type an activity here"
-                                            : null,
-                                      ),
+                                    child: Column(
+                                      children: <Widget>[
+                                        TextField(
+                                          controller: todoController,
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
+                                          style: TextStyle(
+                                            color: _isDone == 1
+                                                ? kPrimaryColor
+                                                : kDarkColor.withOpacity(0.6),
+                                          ),
+                                          decoration: InputDecoration(
+                                            hintText: "Add a todo..",
+                                            hintMaxLines: 2,
+                                            errorText: _todoValidate
+                                                ? "Type an activity here"
+                                                : null,
+                                            border: InputBorder.none
+                                          ),
+                                        ),
+                                        deadlineDateTime == null ? SizedBox() : Text(
+                                          deadlineDateTime.toIso8601String(),
+                                          style: TextStyle(
+                                            color: kDarkColor.withOpacity(0.6),
+                                            fontSize: 8.0
+                                          ),
+                                        )
+                                      ],
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                     ),
                                   ),
                                   SizedBox(
                                     width: 10.0,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      deadlineDateTime = await DatePicker.showDateTimePicker(context);
+                                    },
+                                    child: Container(
+                                      height: 40.0,
+                                      width: 40.0,
+                                      margin: EdgeInsets.only(right: 5.0),
+                                      decoration: BoxDecoration(
+                                          color: kDarkColor,
+                                          borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.timer,
+                                          color: kLiteColor,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () async {
@@ -404,6 +425,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                       ),
                                     ),
                                   ),
+
                                 ],
                               ),
                             ),
