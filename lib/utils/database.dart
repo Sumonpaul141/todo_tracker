@@ -101,4 +101,10 @@ class DatabaseManager{
     _database.close();
   }
 
+  Future<dynamic> getLastId() async {
+    await openDb();
+    var result =  await _database.rawQuery("Select max($colTodoId) From $todoTableName");
+    _database.close();
+    return result;
+  }
 }
