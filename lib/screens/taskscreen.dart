@@ -116,7 +116,7 @@ class _TaskScreenState extends State<TaskScreen> {
         }
         var notificationId = int.parse(widget.task.taskId.toString() + maxTodoID.toString());
         print(notificationId);
-        scheduleAlarm(deadlineDateTime, todoTitle, notificationId);
+        scheduleAlarm(deadlineDateTime, todoTitle, notificationId, taskTitle);
         deadlineDateTime = null;
       }
       Todo todo = Todo(
@@ -476,7 +476,7 @@ class _TaskScreenState extends State<TaskScreen> {
   }
 }
 
-void scheduleAlarm(DateTime scheduledNotificationDateTime, String title, int notificationId) async {
+void scheduleAlarm(DateTime scheduledNotificationDateTime, String title, int notificationId, String taskTitle) async {
   final Int64List vibrationPattern = Int64List(4);
   vibrationPattern[0] = 0;
   vibrationPattern[1] = 1000;
@@ -510,8 +510,8 @@ void scheduleAlarm(DateTime scheduledNotificationDateTime, String title, int not
   //  print(dateTime);
   await flutterLocalNotificationsPlugin.schedule(
       notificationId,
+      taskTitle,
       title,
-      "things need to be done",
       scheduledNotificationDateTime,
       platformChannelSpecifics);
 
