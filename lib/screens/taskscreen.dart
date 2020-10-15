@@ -1,8 +1,10 @@
 import 'dart:math';
-
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:todotrack/models/models.dart';
 import 'package:todotrack/screens/homescreen.dart';
@@ -10,6 +12,10 @@ import 'package:todotrack/utils/alertdialogs.dart';
 import 'package:todotrack/utils/database.dart';
 import 'package:todotrack/values/contants.dart';
 import 'package:todotrack/widgets/widgets.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import '../main.dart';
 
 class TaskScreen extends StatefulWidget {
   final Task task;
@@ -19,6 +25,14 @@ class TaskScreen extends StatefulWidget {
   @override
   _TaskScreenState createState() => _TaskScreenState();
 }
+
+//Future<void> _configureLocalTimeZone() async {
+//  tz.initializeTimeZones();
+//  final String timeZoneName = await platform.invokeMethod("getTimeZoneName");
+//  tz.setLocalLocation(tz.getLocation(timeZoneName));
+//}
+//
+//const MethodChannel platform = MethodChannel('dexterx.dev/flutter_local_notifications_example');
 
 class _TaskScreenState extends State<TaskScreen> {
   TextEditingController titleController, descController, todoController;
@@ -43,8 +57,13 @@ class _TaskScreenState extends State<TaskScreen> {
       taskTitle = widget.task.taskTitle;
       taskDescription = widget.task.taskDescription;
     }
+//    configurationTime();
     super.initState();
   }
+//
+//  void configurationTime() async{
+//    await _configureLocalTimeZone();
+//  }
 
   @override
   void dispose() {
@@ -83,10 +102,21 @@ class _TaskScreenState extends State<TaskScreen> {
     String todoTitle = todoController.value.text.toString();
     if (todoTitle != "" && todoTitle != null) {
       String dateTimeToString;
-      if(deadlineDateTime == null){
+      if (deadlineDateTime == null) {
         dateTimeToString = null;
-      }else{
+      } else {
         dateTimeToString = deadlineDateTime.toIso8601String();
+
+        var ans = await databaseManager.getLastId();
+        int maxTodoID;
+        if (ans[0]["max(todoId)"] == null){
+          maxTodoID = 1;
+        }else{
+          maxTodoID = ans[0]["max(todoId)"] + 1;
+        }
+        var notificationId = int.parse(widget.task.taskId.toString() + maxTodoID.toString());
+        print(notificationId);
+        scheduleAlarm(deadlineDateTime, todoTitle, notificationId);
         deadlineDateTime = null;
       }
       Todo todo = Todo(
@@ -282,14 +312,11 @@ class _TaskScreenState extends State<TaskScreen> {
                                                       : true,
                                                   title:
                                                       todoList[index].todoTitle,
-                                                  dateTime: todoList[index].deadlineDateTime,
+                                                  dateTime: todoList[index]
+                                                      .deadlineDateTime,
                                                 ),
                                                 onTap: () async {
-                                                  int isdone = todoList[index]
-                                                              .todoIsDone ==
-                                                          0
-                                                      ? 1
-                                                      : 0;
+                                                  int isdone = todoList[index].todoIsDone == 0 ? 1: 0 ;
                                                   await databaseManager
                                                       .updateTodoDone(
                                                           todoList[index]
@@ -305,9 +332,10 @@ class _TaskScreenState extends State<TaskScreen> {
                                                 color: kPrimaryColor,
                                               ),
                                               onTap: () async {
+                                                int todoId = todoList[index].todoId;
                                                 await databaseManager
-                                                    .deleteTodo(
-                                                        todoList[index].todoId);
+                                                    .deleteTodo(todoId);
+                                                cancelAlarm(widget.task.taskId, todoId);
                                                 setState(() {});
                                               },
                                             ),
@@ -342,11 +370,11 @@ class _TaskScreenState extends State<TaskScreen> {
                               width: 10.0,
                             )
                           : Container(
-                              padding: EdgeInsets.symmetric(vertical : 10.0 , horizontal: 10.0),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 10.0),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: kWhiteColor
-                              ),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  color: kWhiteColor),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -364,23 +392,26 @@ class _TaskScreenState extends State<TaskScreen> {
                                                 : kDarkColor.withOpacity(0.6),
                                           ),
                                           decoration: InputDecoration(
-                                            hintText: "Add a todo..",
-                                            hintMaxLines: 2,
-                                            errorText: _todoValidate
-                                                ? "Type an activity here"
-                                                : null,
-                                            border: InputBorder.none
-                                          ),
+                                              hintText: "Add a todo..",
+                                              hintMaxLines: 2,
+                                              errorText: _todoValidate
+                                                  ? "Type an activity here"
+                                                  : null,
+                                              border: InputBorder.none),
                                         ),
-                                        deadlineDateTime == null ? SizedBox() : Text(
-                                          deadlineDateTime.toIso8601String(),
-                                          style: TextStyle(
-                                            color: kDarkColor.withOpacity(0.6),
-                                            fontSize: 8.0
-                                          ),
-                                        )
+                                        deadlineDateTime == null
+                                            ? SizedBox()
+                                            : Text(
+                                                deadlineDateTime
+                                                    .toIso8601String(),
+                                                style: TextStyle(
+                                                    color: kDarkColor
+                                                        .withOpacity(0.6),
+                                                    fontSize: 8.0),
+                                              )
                                       ],
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                     ),
                                   ),
                                   SizedBox(
@@ -388,7 +419,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                   ),
                                   GestureDetector(
                                     onTap: () async {
-                                      deadlineDateTime = await DatePicker.showDateTimePicker(context);
+                                      deadlineDateTime =
+                                          await DatePicker.showDateTimePicker(
+                                              context);
                                     },
                                     child: Container(
                                       height: 40.0,
@@ -397,7 +430,7 @@ class _TaskScreenState extends State<TaskScreen> {
                                       decoration: BoxDecoration(
                                           color: kDarkColor,
                                           borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                              BorderRadius.circular(10.0)),
                                       child: Center(
                                         child: Icon(
                                           Icons.timer,
@@ -425,7 +458,6 @@ class _TaskScreenState extends State<TaskScreen> {
                                       ),
                                     ),
                                   ),
-
                                 ],
                               ),
                             ),
@@ -442,4 +474,51 @@ class _TaskScreenState extends State<TaskScreen> {
       ),
     );
   }
+}
+
+void scheduleAlarm(DateTime scheduledNotificationDateTime, String title, int notificationId) async {
+  final Int64List vibrationPattern = Int64List(4);
+  vibrationPattern[0] = 0;
+  vibrationPattern[1] = 1000;
+  vibrationPattern[2] = 5000;
+  vibrationPattern[3] = 2000;
+  vibrationPattern[3] = 5000;
+  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    'alarm_notif',
+    'alarm_notif',
+    'Channel for Alarm notification',
+    icon: 'todologo',
+    sound: RawResourceAndroidNotificationSound('tone_notification'),
+    largeIcon: DrawableResourceAndroidBitmap('todologo'),
+    vibrationPattern: vibrationPattern
+  );
+
+  var iOSPlatformChannelSpecifics = IOSNotificationDetails(
+      sound: 'tone_notification.wav',
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true);
+  var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics);
+
+  //  var dateTime = tz.TZDateTime.from(scheduledNotificationDateTime, tz.local).add(Duration(hours: 6));
+  //  await flutterLocalNotificationsPlugin.zonedSchedule(0, title, "it's time to complete it.",
+  //      dateTime, platformChannelSpecifics,
+  //      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, androidAllowWhileIdle: true);
+  //  print("done at : ");
+  //  print(dateTime);
+  await flutterLocalNotificationsPlugin.schedule(
+      notificationId,
+      title,
+      "things need to be done",
+      scheduledNotificationDateTime,
+      platformChannelSpecifics);
+
+
+}
+void cancelAlarm(int taskId, int todoID) async {
+  var notificationId = int.parse(taskId.toString() + todoID.toString());
+  print(notificationId);
+  await flutterLocalNotificationsPlugin.cancel(notificationId);
 }
